@@ -36,7 +36,7 @@ var rotateSys = {
                 case 0: i = 4; break;
             }
         }
-        if (kind) {
+        if (kind != 1) {
             posOffset.push(this.NomalkickData[i][index * 2]);
             posOffset.push(this.NomalkickData[i][index * 2 + 1]);
         }
@@ -120,11 +120,12 @@ var rotateSys = {
     },
     srsRot: function (n, tetro, _feild = tetris.board) {
         var real;
-        var old_pos = new Pos(tetro.pos.x,tetro.pos.y);
+        var old_pos = new Pos(tetro.pos.x, tetro.pos.y);
         var Thiskind = tetro.kind;
         var pos = tetro.pos;
         for (var i = 0; i < 5; i++) {
             var Offset = this.getOffset(tetro, n, i, Thiskind);
+            //console.log(`(${Offset[0]},${Offset[1]})`)
             pos.y -= Offset[1];
             pos.x += Offset[0];
             real = this.rotate(n, tetro, _feild);
@@ -140,7 +141,7 @@ var rotateSys = {
     },
     Rot180: function (n, tetro, _feild = tetris.board) {
         var real;
-        var old_pos = new Pos(tetro.pos.x,tetro.pos.y);
+        var old_pos = new Pos(tetro.pos.x, tetro.pos.y);
         //var Thiskind = tetro.kind;
         var pos = tetro.pos;
         var rotateState = tetro.rotateState;

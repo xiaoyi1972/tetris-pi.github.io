@@ -186,6 +186,21 @@ border-color:blue;
 
 
 @keyframes tetris{
+	0%{opacity: 0;
+        transform:translate(-50%,-50%) matrix(1.2, 1, 0, 0.5, 0, 0)
+    }
+	45%{opacity: 1;
+        transform:translate(-50%,-50%) matrix(1, 0.1, 0, 1, 0, 0)
+    }
+    55%{opacity: 1;
+        transform:translate(-50%,-50%) matrix(1, 0, 0.1, 1, 0, 0)
+    }
+	100%{opacity: 0;
+        transform:translate(-50%,-50%) matrix(2, -1, -1, 0.1, 0, 0) 
+    }
+}
+
+@keyframes perfectclear{
     0%{opacity: 0;
         transform:translate(-50%,-50%) skew(45deg, 45deg)
     }
@@ -211,6 +226,10 @@ border-color:blue;
 
 .animeren{
     animation:ren 1000ms ease-in-out;
+}
+
+.animeperfectclear{
+    animation:perfectclear 1000ms ease-in-out;
 }
 
 .test1{
