@@ -2093,7 +2093,7 @@ let x = function () {
             let i = 0;
             let prune_hold = (++this.context.width);
             let prune_hold_max = prune_hold * 3;
-            let next_length_max = this.nexts.length;
+            let next_length_max = this.nexts.length+1;
             if (this.context.is_open_hold && this.hold == -1) {
                 --next_length_max;
             }
