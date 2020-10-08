@@ -1,0 +1,229 @@
+body{
+    margin: 0;
+	padding: 0;
+    /*background: url('../img/bg.png') repeat;*/
+}
+
+.contain{
+    position: relative;
+    width:360px;
+    margin:0 auto;
+}
+
+#pos{
+position:absolute;
+left:-50px;
+}
+
+.test{
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    box-sizing:border-box;
+    padding:0.5px;
+    background:linear-gradient(45deg,#eea73d 50%,rgba(238,167,61,0.85) 50%) content-box;
+}
+
+div{
+    user-select: none;
+}
+
+.hold{
+    position: absolute;
+    top:0px;
+    left:0px;
+    margin:0px 0px 0px -1px;
+}
+
+.inf{
+    position: absolute;
+    bottom: -400px;
+    right: 282px;
+}
+
+#fps{
+position:absolute;
+left:175px;
+top:410px;
+}
+
+.inf div{
+    font-size:20px;
+}
+/*.paint
+{
+    position: absolute;
+    top:0px;
+    left:80px;
+}*/
+
+.next{
+    position: absolute;
+    margin:1px;
+    top:0px;
+    left:280px;
+    margin:0px 0px 0px 1px;
+}
+
+.paint{
+position: absolute;
+    top:0px;
+    left:80px;
+}
+
+.menu{
+    position:absolute;
+    left:285px;
+    bottom:-400px;
+    height:fit-content;
+    width:fit-content;
+}
+
+.BaseSelect{
+    /*position:absolute;*/
+    /*left:285px;
+    top:380px;*/
+    width:fit-content;
+    font-size:18px;
+    font-weight:normal;
+    transition:background-color 500ms;
+    transition:font-weight 250ms;
+}
+
+.BaseSelect:hover{
+    width:fit-content;
+    background:rgba(115,115,115,0.2);
+    font-weight:bold;
+}
+
+#Hotkey{
+    position:absolute;
+    top:0px;
+    left:80px;
+    /*margin:0 auto;*/
+    width: 202px;
+    height: 400px;
+    background: rgba(115,115,115,0.1);
+    z-index: 999;
+   /* display: table-cell;*/
+    text-align: center;
+    vertical-align: middle;
+    overflow-y:auto
+}
+
+#Hotkey input{
+    width:50px;
+    text-align:center;
+}
+
+.keySet{
+    border-radius:5px;
+    border-width:0px;
+}
+
+.inputText{display:inline;}
+.input:focus
+{
+border-color:blue;
+}
+
+.message{
+    position: absolute;
+    margin: 0 auto;
+    width: 202px;
+    height: 120px;
+    background: rgba(115,115,115,0.1);
+    top: 140px;
+    z-index: 999;
+    left: 80px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.message div{
+    position: relative;
+    margin: 0 auto;
+    margin-top: 30px;
+    font-weight: normal;
+    font-size: 25px;
+    /*width: 140px;*/
+}
+
+@keyframes general{
+    0%{opacity: 0;
+    }
+    40%{opacity: 1;
+    }
+    100%{opacity: 0;
+    }
+}
+
+@keyframes spin{
+    0%{opacity: 0;
+        transform:translate(-50%,-50%) rotate(70deg)
+    }
+    40%{opacity: 1;
+        transform:translate(-50%,-50%) rotate(0deg)  scale(1);
+        /*transform:rotate(360deg);*/
+    }
+    100%{opacity: 0;
+        transform:translate(-50%,-50%) scale(1.2);
+        /*transform:rotate(360deg);*/
+    }
+}
+
+@keyframes ren{
+    0%{opacity: 0;
+        transform:translate(-50%,-50%) scaleX(1.7) 
+    }
+    40%{opacity: 1;
+        transform:translate(-50%,-50%) scaleX(1)
+    }
+    100%{opacity: 0;
+        transform:translate(-50%,-50%) rotateY(90deg)
+    }
+}
+
+
+@keyframes tetris{
+    0%{opacity: 0;
+        transform:translate(-50%,-50%) skew(45deg, 45deg)
+    }
+    40%{opacity: 1;
+        transform:translate(-50%,-50%) skew(0deg, 0deg)
+    }
+    100%{opacity: 0;
+        transform:translate(-50%,-50%) skew(-45deg, -45deg)
+    }
+}
+
+.animegeneral{
+     animation:general 1000ms ease-in-out;
+}
+
+.animespin{
+    animation:spin 1000ms ease-in-out;
+}
+
+.animetetris{
+    animation:tetris 1000ms ease-in-out;
+}
+
+.animeren{
+    animation:ren 1000ms ease-in-out;
+}
+
+.test1{
+    position:absolute;
+    top: 40%;
+    left: 50%;
+    transform:translate(-50%,-50%);
+    
+    /*margin: 0 auto;*/ 
+    font-weight: normal;
+    font-size: 23px;
+    white-space: nowrap;
+    text-align: center;
+   /* text-shadow: rgba(211,211,211,0.5) 1px 1px 1px;*/
+    /*width: 140px;*/
+}

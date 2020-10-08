@@ -1,0 +1,131 @@
+<html>
+<meta charset="UTF-8">
+<title>皮皮虾块</title>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="css/tetris.css" />
+</head>
+
+<body>
+    <div class='test' style='display:none'></div>
+    <div class='contain'>
+        <div class='paint'>
+            <canvas id="drawCanvas" width="201px" height="401px"></canvas>
+            <!--style="border:1px solid #000000;"-->
+        </div>
+
+        <div class='hold'>
+            <div id="Hold" style="text-align:center;font-size:20px">暂存</div>
+            <canvas id="holdCanvas" width="80px" height="80px"></canvas>
+        </div>
+
+        <div class='next'>
+            <div id="Next" style="text-align:center;font-size:20px">预览</div>
+            <canvas id="nextCanvas" width="80px" height="400px"></canvas>
+        </div>
+
+        <div class="menu">
+        <div class="BaseSelect" onclick="botButton()">bot代打</div>
+        <div class="BaseSelect" onclick="restartGame()">重开</div>
+        <div class="BaseSelect" onclick="BaseSelect()">设置</div>
+        </div>
+
+        <div id='fps' style="font-size:20px"></div>
+        <div class='inf'>
+            <div>时间</div>
+            <div id="time">0</div>
+            <div>消行数</div>
+            <div id="clearline">0</div>
+            <div style="display:none">测试</div>
+            <div id="t" style="display:none">0</div>
+        </div>
+
+
+        <!--按键菜单-->
+        <div id="Hotkey" style="display:none">
+            <div>
+                <div style="display:inline;">左:</div>
+                <input id="leftInput" type="text" style="display:inline;" class="keySet"
+                    onkeydown="LeftChangeKey(event)" readonly="readonly"></input>
+            </div>
+            <div>
+                <div style="display:inline;">右:</div>
+                <input id="rightInput" type="text" style="display:inline;" class="keySet"
+                    onkeydown="RightChangeKey(event)" readonly="readonly"></input>
+            </div>
+            <div>
+                <div style="display:inline;">旋转(顺):</div>
+                <input id="rotInput" type="text" style="display:inline;" class="keySet" onkeydown="RotChangeKey(event)"
+                    readonly="readonly"></input>
+            </div>
+            <div>
+                <div style="display:inline;">旋转(逆):</div>
+                <input id="lotInput" type="text" style="display:inline;" class="keySet" onkeydown="LotChangeKey(event)"
+                    readonly="readonly"></input>
+            </div>
+            <div>
+                <div style="display:inline;">软降:</div>
+                <input id="softdownInput" type="text" style="display:inline;" class="keySet"
+                    onkeydown="SoftdownChangeKey(event)" readonly="readonly"></input>
+            </div>
+            <div>
+                <div style="display:inline;">硬降:</div>
+                <input id="dropInput" type="text" style="display:inline;" class="keySet"
+                    onkeydown="DropChangeKey(event)" readonly="readonly"></input>
+            </div>
+            <div>
+                <div style="display:inline;">暂存:</div>
+                <input id="holdInput" type="text" style="display:inline;" class="keySet"
+                    onkeydown="HoldChangeKey(event)" readonly="readonly"></input>
+            </div>
+            <div>
+                <div style="display:inline;">180°旋转:</div>
+                <input id="_180Input" type="text" style="display:inline;" class="keySet"
+                    onkeydown="_180ChangeKey(event)" readonly="readonly"></input>
+            </div>
+            <div>
+                <div style="display:inline;">das:</div>
+                <input id="dasInput" type="text" style="display:inline;" class="inputText"
+                    onchange="ReturnChangeDas(this.value)"></input>
+            </div>
+            <div>
+                <div style="display:inline;">arr:</div>
+                <input id="arrInput" type="text" style="display:inline;" class="inputText"
+                    onchange="ReturnChangeArr(this.value)"></input>
+            </div>
+            <div>
+                <div style="display:inline;">软降das:</div>
+                <input id="dasdownInput" type="text" style="display:inline;" class="inputText"
+                    onchange="ReturnChangeDasdown(this.value)"></input>
+            </div>
+            <br>
+            <div>
+                <div style="display:inline;">录像回放</div>
+                <br>
+                <textarea id="videoInput" rows=5 cols=25 style="display:inline;"></textarea>
+                <button onClick='videoRecord()'>回放</button>
+            </div>
+        </div>
+
+
+
+        <!--信息菜单-->
+        <div class='message' style="display:none">
+            <div id='score'></div>
+        </div>
+
+    </div>
+    <script type="text/javascript" src="js/other.js"></script>
+    <script type="text/javascript" src="js/Tween.js"></script>
+    <script type="text/javascript" src="js/option.js"></script>
+    <script type="text/javascript" src="js/keyState.js"></script>
+    <script type="text/javascript" src="js/keyManager.js"></script>
+    <script type="text/javascript" src="js/keycode.js"></script>
+    <script type="text/javascript" src="js/rotateSystem.js"></script>
+    <script type="text/javascript" src="js/record.js"></script>
+    <script id="bot" type="text/javascript" src="js/bot.js"></script>
+    <script type="text/javascript" src="js/particles.js"></script>
+    <script type="text/javascript" src="js/tetris.js"></script>
+</body>
+
+</html>
