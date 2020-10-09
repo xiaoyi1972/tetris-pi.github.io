@@ -567,7 +567,7 @@ let x = function () {
                                 if (row2_check == 1 || row2_check == 4) {
                                     result.t2_value += 2;
                                 }
-                                finding2 = false;
+                                //finding2 = false;
                             }
                         }
                     }
@@ -753,7 +753,7 @@ let x = function () {
                 + (result.b2b ? 512 : 0)
                 + result.like * 64
             ) * Math.max(0.05, (full_count_ - eval_result.count - result.map_rise * (10)) / (full_count_))
-                + result.max_combo * (result.max_combo - 1) * 40
+               // + result.max_combo * (result.max_combo - 1) * 40
             );
             return result;
         }
