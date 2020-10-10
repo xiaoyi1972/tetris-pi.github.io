@@ -464,7 +464,7 @@ let x = function () {
                 LineCoverBits: 0,
                 HolePosyIndex: 0,
             };
-            let a = new Array(40).fill(new Object());
+            let a = new Array(40).fill({ ClearWidth: 0 });
             for (let y = roof - 1; y >= 0; --y) {
                 v.LineCoverBits |= map.row[y];
                 let LineHole = v.LineCoverBits ^ map.row[y];
@@ -567,7 +567,7 @@ let x = function () {
                                 if (row2_check == 1 || row2_check == 4) {
                                     result.t2_value += 2;
                                 }
-                                //finding2 = false;
+                                finding2 = false;
                             }
                         }
                     }
@@ -748,12 +748,12 @@ let x = function () {
             result.value += ((0
                 + result.max_attack * 40
                 + result.attack * 256 * rate
-                + eval_result.t2_value * (t_expect(nexts) < 8 ? 512 : 320) * 1.5
+                + (eval_result.t2_value) * (t_expect(nexts) < 8 ? 512 : 320) * 1.5
                 + (eval_result.safe >= 12 ? eval_result.t3_value * (t_expect(nexts) < 4 ? 10 : 8) * (result.b2b ? 512 : 256) / (6 + result.under_attack) : 0)
                 + (result.b2b ? 512 : 0)
                 + result.like * 64
             ) * Math.max(0.05, (full_count_ - eval_result.count - result.map_rise * (10)) / (full_count_))
-               // + result.max_combo * (result.max_combo - 1) * 40
+                + result.max_combo * (result.max_combo - 1) * 40
             );
             return result;
         }
@@ -1882,9 +1882,9 @@ let x = function () {
 
         corner3(map) {
             function checkCrossBorder(mx, my) {
-                let res = 0;
+                let res = 1;
                 if (mx < 0 || mx > (map.width - 1) || my < 0 || my > (map.height - 1))
-                    res = 1;
+                    res = 0;
                 return res;
             }
             let _x = this.status.x;
@@ -1893,19 +1893,19 @@ let x = function () {
             //[<>,[],<>]
             //[[],<>,[]]
             //[<>,[],<>]
-            if (!checkCrossBorder(_y + 1, _x + 2) || (!this.full(2, 1) && map.full(_x + 2, _y + 1)))
+            if (!checkCrossBorder(_x + 2, _y + 1) || (!this.full(2, 1) && map.full(_x + 2, _y + 1)))
                 mini++;
-            if (!checkCrossBorder(_y + 0, _x + 1) || (!this.full(1, 0) && map.full(_x + 1, _y + 0)))
+            if (!checkCrossBorder(_x + 1, _y + 0) || (!this.full(1, 0) && map.full(_x + 1, _y + 0)))
                 mini++;
-            if (!checkCrossBorder(_y + 2, _x + 1) || (!this.full(1, 2) && map.full(_x + 1, _y + 2)))
+            if (!checkCrossBorder(_x + 1, _y + 2) || (!this.full(1, 2) && map.full(_x + 1, _y + 2)))
                 mini++;
-            if (!checkCrossBorder(_y + 1, _x + 0) || (!this.full(0, 1) && map.full(_x + 0, _y + 1)))
+            if (!checkCrossBorder(_x + 0, _y + 1) || (!this.full(0, 1) && map.full(_x + 0, _y + 1)))
                 mini++;
 
-            if (!checkCrossBorder(_y, _x) || map.full(_x, _y)) sum++;
-            if (!checkCrossBorder(_y + 2, _x) || map.full(_x, _y + 2)) sum++;
-            if (!checkCrossBorder(_y, _x + 2) || map.full(_x + 2, _y)) sum++;
-            if (!checkCrossBorder(_y + 2, _x + 2) || map.full(_x + 2, _y + 2)) sum++;
+            if (!checkCrossBorder(_x, _y,) || map.full(_x, _y)) sum++;
+            if (!checkCrossBorder(_x, _y + 2,) || map.full(_x, _y + 2)) sum++;
+            if (!checkCrossBorder(_x + 2, _y) || map.full(_x + 2, _y)) sum++;
+            if (!checkCrossBorder(_x + 2, _y + 2) || map.full(_x + 2, _y + 2)) sum++;
 
             if (sum > 2) {
                 ifspin = 1;
@@ -2093,7 +2093,7 @@ let x = function () {
             let i = 0;
             let prune_hold = (++this.context.width);
             let prune_hold_max = prune_hold * 3;
-            let next_length_max = this.nexts.length+1;
+            let next_length_max = this.nexts.length + 1;
             if (this.context.is_open_hold && this.hold == -1) {
                 --next_length_max;
             }
