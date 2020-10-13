@@ -515,7 +515,7 @@ let x = function () {
                 - roof * 128
                 - ColTrans * 160
                 - RowTrans * 160
-                - v.HoleCount * 80
+                //- v.HoleCount * 80
                 - v.HoleLine * 380
                 - v.WellDepth * 100
                 - v.HoleDepth * 40
@@ -567,15 +567,23 @@ let x = function () {
                                 if (row2_check == 1 || row2_check == 4) {
                                     result.t2_value += 2;
                                 }
+                                /* if (row2_check == 5) {
+                                     result.t2_value += 2;
+                                 }*/
                                 finding2 = false;
                             }
                         }
                     }
                 }
                 for (let x = 0; finding3 && x < map.width - 3; ++x) {
-                    if (((row0 >> x) & 15) == 11 && ((row1 >> x) & 15) == 9) {
+                    let row0_check = ((row0 >> x) & 15);
+                    let row4 = y + 4 < map.height ? map.row[y + 4] : 0;
+                    let stsd0 = ((y - 1) > -1) ? map.full(map.width - (x + 1), y - 1) : 1
+                    let stsd1 = ((y - 1) > -1) ? map.full(map.width - (x + 2), y - 1) : 1
+                    if ((row0_check == 11 || row0_check == 9) && ((row1 >> x) & 15) == 9) {
                         let t3_value = 0;
-                        if (BitCount(row0) == map.width - 1) {
+                        if ((row0_check == 11 && BitCount(row0) == map.width - 1)
+                            || (row0_check == 9 && BitCount(row0) == map.width - 2 && stsd1)) {
                             t3_value += 1;
                             if (BitCount(row1) == map.width - 2) {
                                 t3_value += 1;
@@ -606,9 +614,10 @@ let x = function () {
                             finding3 = false;
                         }
                     }
-                    if (((row0 >> x) & 15) == 13 && ((row1 >> x) & 15) == 9) {
+                    if ((row0_check == 13 || row0_check == 9) && ((row1 >> x) & 15) == 9) {
                         let t3_value = 0;
-                        if (BitCount(row0) == map.width - 1) {
+                        if ((row0_check == 13 && BitCount(row0) == map.width - 1) ||
+                            (row0_check == 9 && BitCount(row0) == map.width - 2 && stsd0)) {
                             t3_value += 1;
                             if (BitCount(row1) == map.width - 2) {
                                 t3_value += 1;
@@ -730,6 +739,7 @@ let x = function () {
                 }
                 return 14;
             };
+
             switch (hold) {
                 case Piece.T:
                     if (eval_result.t_spin == TSpinType.None) {
@@ -742,7 +752,7 @@ let x = function () {
                     }
                     break;
             }
-            let rate = 1 / (nexts.length > 0 ? (depth + 1) : 1) + 3;// nexts.length + 1 -
+            let rate = 1 / (nexts.length > 0 ? (nexts.length + 1 - (depth) + 1) : 1) + 3;// nexts.length + 1 -
             result.max_combo = Math.max(result.combo, result.max_combo);
             result.max_attack = Math.max(result.attack, result.max_attack);
             result.value += ((0
@@ -1956,6 +1966,7 @@ let x = function () {
             this.extended = false;//是否拓展
             this.is_hold = false;
             this.is_hold_lock = false;
+            this.vp = false;
             this.hold = -1;
             this.status = { combo: 0, b2b: 0, attack: 0, like: 0, max_combo: 0, max_attack: 0, value: 0 };
         }
@@ -1972,6 +1983,9 @@ let x = function () {
                 for (let i_node of land_points) {
                     let new_tree = this.context.create();
                     let next_node = this.context.tetrisOpertion.generate_template_t(this.nexts[this.nextIndex]);
+                    if (next_node == undefined)
+                        new_tree.vp = true;
+
                     new_tree.parent = this;
                     new_tree.node = next_node;
                     new_tree.nexts = this.nexts;
@@ -2007,66 +2021,84 @@ let x = function () {
                 this.is_hold_lock = false;
                 return;
             }
-            if (this.node.status == this.hold) {
-                if (this.land_point.length == 0) {
-                    this.land_point.push(this.node);
-                    //if (this.map != null && this.node != null)
-                    let land_points = land_point_search.search(this.map, this.node);
-                    for (let i_node of land_points) {
-                        let new_tree = this.context.create();
-                        let next_node = this.context.tetrisOpertion.generate_template_t(this.nexts[this.nextIndex]);
-                        new_tree.parent = this;
-                        new_tree.node = next_node;
-                        new_tree.nexts = this.nexts;
-                        new_tree.nextIndex = this.nextIndex + 1;
-                        new_tree.hold = this.hold;
-                        new_tree.is_hold = false ^ hold_opposite;
-                        let map_copy = this.map.clone();
-                        new_tree.map = map_copy;
-                        new_tree.evalParm.clear = i_node.tn.attach(map_copy);
-                        new_tree.evalParm.land_node = i_node;
-                        this.children.push(new_tree)
+            if (this.node == undefined) {
+                let new_tree = this.context.create();
+                //let next_node = this.context.tetrisOpertion.generate_template_t(this.nexts[this.nextIndex]);
+                new_tree.vp = true;
+                new_tree.parent = this;
+                new_tree.node = null;
+                new_tree.nexts = this.nexts;
+                new_tree.nextIndex = this.nextIndex + 1;
+                new_tree.hold = this.hold;
+                new_tree.is_hold = this.is_hold;
+                let map_copy = this.map.clone();
+                new_tree.map = map_copy;
+                new_tree.evalParm.clear = -1
+                new_tree.evalParm.land_node = null;
+                this.children.push(new_tree)
+            }
+            else {
+                if (this.node.status == this.hold) {
+                    if (this.land_point.length == 0) {
+                        this.land_point.push(this.node);
+                        //if (this.map != null && this.node != null)
+                        let land_points = land_point_search.search(this.map, this.node);
+                        for (let i_node of land_points) {
+                            let new_tree = this.context.create();
+                            let next_node = this.context.tetrisOpertion.generate_template_t(this.nexts[this.nextIndex]);
+                            new_tree.parent = this;
+                            new_tree.node = next_node;
+                            new_tree.nexts = this.nexts;
+                            new_tree.nextIndex = this.nextIndex + 1;
+                            new_tree.hold = this.hold;
+                            new_tree.is_hold = false ^ hold_opposite;
+                            let map_copy = this.map.clone();
+                            new_tree.map = map_copy;
+                            new_tree.evalParm.clear = i_node.tn.attach(map_copy);
+                            new_tree.evalParm.land_node = i_node;
+                            this.children.push(new_tree)
+                        }
                     }
                 }
-            }
-            else if (this.node.status != this.hold) {
-                let hold_node = this.context.tetrisOpertion.generate_template_t(this.hold);
-                if (this.land_point.length == 0) {
-                    this.land_point.push(this.node);
-                    this.land_point.push(hold_node);
-                    //if (this.map != null && this.node != null)
-                    let land_points = land_point_search.search(this.map, this.node);
-                    for (let i_node of land_points) {
-                        let new_tree = this.context.create();
-                        let next_node = this.context.tetrisOpertion.generate_template_t(this.nexts[this.nextIndex]);
-                        new_tree.parent = this;
-                        new_tree.node = next_node;
-                        new_tree.nexts = this.nexts;
-                        new_tree.nextIndex = this.nextIndex + 1;
-                        new_tree.hold = this.hold;
-                        new_tree.is_hold = false ^ hold_opposite;
-                        let map_copy = this.map.clone();
-                        new_tree.map = map_copy;
-                        new_tree.evalParm.clear = i_node.tn.attach(map_copy);
-                        new_tree.evalParm.land_node = i_node;
-                        this.children.push(new_tree)
-                    }
-                    //if (this.map != null && hold_node != null)
-                    let hold_land_points = land_point_search.search(this.map, hold_node);
-                    for (let i_node of hold_land_points) {
-                        let new_tree = this.context.create();
-                        let next_node = this.context.tetrisOpertion.generate_template_t(this.nexts[this.nextIndex]);
-                        new_tree.parent = this;
-                        new_tree.node = next_node;
-                        new_tree.nexts = this.nexts;
-                        new_tree.nextIndex = this.nextIndex + 1;
-                        new_tree.hold = this.node.status.t;
-                        new_tree.is_hold = true ^ hold_opposite;
-                        let map_copy = this.map.clone();
-                        new_tree.map = map_copy;
-                        new_tree.evalParm.clear = i_node.tn.attach(map_copy);
-                        new_tree.evalParm.land_node = i_node;
-                        this.children.push(new_tree)
+                else if (this.node.status != this.hold) {
+                    let hold_node = this.context.tetrisOpertion.generate_template_t(this.hold);
+                    if (this.land_point.length == 0) {
+                        this.land_point.push(this.node);
+                        this.land_point.push(hold_node);
+                        //if (this.map != null && this.node != null)
+                        let land_points = land_point_search.search(this.map, this.node);
+                        for (let i_node of land_points) {
+                            let new_tree = this.context.create();
+                            let next_node = this.context.tetrisOpertion.generate_template_t(this.nexts[this.nextIndex]);
+                            new_tree.parent = this;
+                            new_tree.node = next_node;
+                            new_tree.nexts = this.nexts;
+                            new_tree.nextIndex = this.nextIndex + 1;
+                            new_tree.hold = this.hold;
+                            new_tree.is_hold = false ^ hold_opposite;
+                            let map_copy = this.map.clone();
+                            new_tree.map = map_copy;
+                            new_tree.evalParm.clear = i_node.tn.attach(map_copy);
+                            new_tree.evalParm.land_node = i_node;
+                            this.children.push(new_tree)
+                        }
+                        //if (this.map != null && hold_node != null)
+                        let hold_land_points = land_point_search.search(this.map, hold_node);
+                        for (let i_node of hold_land_points) {
+                            let new_tree = this.context.create();
+                            let next_node = this.context.tetrisOpertion.generate_template_t(this.nexts[this.nextIndex]);
+                            new_tree.parent = this;
+                            new_tree.node = next_node;
+                            new_tree.nexts = this.nexts;
+                            new_tree.nextIndex = this.nextIndex + 1;
+                            new_tree.hold = this.node.status.t;
+                            new_tree.is_hold = true ^ hold_opposite;
+                            let map_copy = this.map.clone();
+                            new_tree.map = map_copy;
+                            new_tree.evalParm.clear = i_node.tn.attach(map_copy);
+                            new_tree.evalParm.land_node = i_node;
+                            this.children.push(new_tree)
+                        }
                     }
                 }
             }
@@ -2081,10 +2113,20 @@ let x = function () {
             }
 
             for (let child of this.children) {
-                let eval_result = Evaluation.eval_map(child.map, child.evalParm.land_node, child.evalParm.clear);
-                let p = Evaluation.get(eval_result, child.nextIndex, this.status, child.hold, child.nexts)
-                child.status = p;
-                child.value = p.value;
+                if (child.vp) {
+                    for (let type_i = 0; type_i < 7; type_i++) {
+                        let type_node = this.context.tetrisOpertion.generate_template_t(type_i);
+                        child.value += getVpValue(type_node, child.map);
+                    }
+                    child.value /= 7
+                    //console.log('vp')
+                }
+                else {
+                    let eval_result = Evaluation.eval_map(child.map, child.evalParm.land_node, child.evalParm.clear);
+                    let p = Evaluation.get(eval_result, child.nextIndex, this.status, child.hold, child.nexts)
+                    child.status = p;
+                    child.value = p.value;
+                }
             }
             return true;
         }
@@ -2164,6 +2206,21 @@ let x = function () {
         }
     }
 
+    function getVpValue(_node, _map) {
+        let land_points = land_point_search.search(_map, _node);
+        let eval = -9999;
+        for (node_i of land_points) {
+            let copy = _map.clone();
+            let clear = node_i.tn.attach(copy);
+            let new_eval;
+            let p = Evaluation.eval_map(copy, node_i, clear);
+            new_eval = p.value;
+            if (new_eval > eval) {
+                eval = new_eval;
+            }
+            return eval;
+        }
+    }
 
 
     let Piece = { O: 0, I: 1, T: 2, J: 3, L: 4, Z: 5, S: 6 }

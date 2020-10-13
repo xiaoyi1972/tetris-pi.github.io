@@ -117,7 +117,7 @@ var KeyManager = function(options) {
             clearTimeout(tetris.timerA)
             clearTimeout(tetris.timerB)
             let str = record.encode();
-            console.log('str',str)
+            //console.log('str',str)
             record.decode(str);
             tetris.replay();
         }
@@ -177,3 +177,132 @@ function botButton(){
     });
     document.body.dispatchEvent(ev);
 }
+
+
+//定义变量，用于记录坐标和角度
+let startx, starty, movex, movey, endx, endy, nx, ny, angle;
+let movingCountx, movingCounty;
+let cWidth = document.querySelector('#drawCanvas').width;
+let softdropTriggered = false;
+let softdropPressed = false, softdropHandle = null;
+let touchstartTime;
+//开始触摸函数，event为触摸对象
+function touchs(event) {
+    //阻止浏览器默认滚动事件
+    event.preventDefault();
+
+    //通过if语句判断event.type执行了哪个触摸事件
+    if (event.type == "touchstart") {
+        touchstartTime = new Date();
+        //console.log('开始');
+
+        softdropPressed = true;
+        //获取开始的位置数组的第一个触摸位置
+        let touch = event.touches[0];
+
+        //获取第一个坐标的X轴
+        startx = Math.floor(touch.pageX);
+
+        //获取第一个坐标的X轴
+        starty = Math.floor(touch.pageY);
+
+        movingCountx = startx;
+        movingCounty = starty;
+
+
+        //触摸中的坐标获取
+    } else if (event.type == "touchmove") {
+
+        //console.log('滑动中');
+        let touch = event.touches[0];
+        movex = Math.floor(touch.pageX);
+        movey = Math.floor(touch.pageY);
+
+        let x_delta = Math.abs(movex - movingCountx)
+        let y_delta = Math.abs(movey - movingCounty)
+        if (x_delta >= 20) {
+            if (movex - movingCountx < 0) {
+                option.leftFunc()
+                movingCountx = movex;
+            }
+            else if (movex - movingCountx > 0) {
+                option.rightFunc()
+                movingCountx = movex;
+            }
+        }
+        if (y_delta >= 20)
+            if (movey - movingCounty > 0) {
+                if (!softdropTriggered) {
+                    softdropTriggered = true;
+                    softdropHandle = setInterval(option.downFunc, 30);
+                }
+                movingCounty = movey;
+            }
+        //当手指离开屏幕或系统取消触摸事件的时候
+    } else if (event.type == "touchend" || event.type == "touchcancel") {
+        let canvas = document.querySelector("#drawCanvas");
+        let box = canvas.getBoundingClientRect();
+        let mouseX = (event.changedTouches[0].pageX - box.left) * canvas.width / box.width;
+
+        let deltaTime = new Date() - touchstartTime;
+
+        if (startx == Math.floor(event.changedTouches[0].pageX)) {
+            if (mouseX < (cWidth / 2))
+                option.rotateRightFunc();
+            else if (mouseX > (cWidth / 2))
+                option.rotateFunc();
+        }
+
+        //获取最后的坐标位置
+        endx = Math.floor(event.changedTouches[0].pageX);
+        endy = Math.floor(event.changedTouches[0].pageY);
+        //console.log('结束');
+
+        //获取开始位置和离开位置的距离
+        nx = endx - startx;
+        ny = endy - starty;
+
+        clearInterval(softdropHandle)
+        softdropPressed = false;
+
+
+        if (ny > 0 && deltaTime < 800)
+            option.dropFunc()
+
+        softdropTriggered = false;
+
+        if (ny < -20)
+            option.holdFunc()
+        //通过坐标计算角度公式 Math.atan2(y,x)*180/Math.PI
+
+        /*
+        angle = Math.atan2(ny, nx) * 180 / Math.PI;
+
+        if (Math.abs(nx) <= 1 || Math.abs(ny) <= 1) {
+            return false;
+            //console.log('滑动距离太小');
+        }
+
+        //通过滑动的角度判断触摸的方向
+        if (angle < 45 && angle >= -45) {
+            //console.log('右滑动');
+            return false;
+        } else if (angle < 135 && angle >= 45) {
+            //console.log('下滑动');
+            return false;
+        } else if ((angle <= 180 && angle >= 135) || (angle >= -180 && angle < -135)) {
+            //console.log('左滑动');
+            return false;
+        } else if (angle <= -45 && angle >= -135) {
+            //console.log('上滑动');
+            return false;
+        }
+        */
+
+    }
+}
+
+//添加触摸事件的监听，并直行自定义触摸函数
+document.querySelector('#drawCanvas').addEventListener('touchstart', touchs, false);
+document.querySelector('#drawCanvas').addEventListener('touchmove', touchs, false);
+document.querySelector('#drawCanvas').addEventListener('touchend', touchs, false);
