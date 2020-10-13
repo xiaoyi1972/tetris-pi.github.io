@@ -220,6 +220,7 @@ function touchs(event) {
 
         let x_delta = Math.abs(movex - movingCountx)
         let y_delta = Math.abs(movey - movingCounty)
+        let deltaTime = new Date() - touchstartTime;
         if (x_delta >= 20) {
             if (movex - movingCountx < 0) {
                 operationTriggered = true;
@@ -232,7 +233,7 @@ function touchs(event) {
                 movingCountx = movex;
             }
         }
-        if (y_delta >= 20)
+        if (y_delta >= 20 && deltaTime > 400)
             if (movey - movingCounty > 0) {
                 if (!softdropTriggered) {
                     softdropTriggered = true;
