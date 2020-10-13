@@ -752,7 +752,7 @@ let x = function () {
                     }
                     break;
             }
-            let rate = 1 / (nexts.length > 0 ? (nexts.length + 1 - (depth) + 1) : 1) + 3;// nexts.length + 1 -
+            let rate = 1 / (nexts.length > 0 ? ((depth) + 1) : 1) + 5;// nexts.length + 1 -
             result.max_combo = Math.max(result.combo, result.max_combo);
             result.max_attack = Math.max(result.attack, result.max_attack);
             result.value += ((0
