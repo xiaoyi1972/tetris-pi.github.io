@@ -268,7 +268,7 @@ function touchs(event) {
         softdropPressed = false;
 
 
-        if (ny > 0 && deltaTime < 800 && !operationTriggered)
+        if (ny > 0 && deltaTime < 800 && !operationTriggered && !softdropTriggered)
             option.dropFunc()
 
         softdropTriggered = false;
