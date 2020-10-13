@@ -189,7 +189,7 @@ let touchstartTime;
 //开始触摸函数，event为触摸对象
 function touchs(event) {
     //阻止浏览器默认滚动事件
-    //event.preventDefault();
+    event.preventDefault();
 
     //通过if语句判断event.type执行了哪个触摸事件
     if (event.type == "touchstart") {
