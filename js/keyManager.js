@@ -1,4 +1,4 @@
-var KeyManager = function(options) {
+var KeyManager = function (options) {
     this.enable = true;
     this.socket = options.socket;
     var keyboard = options.keyboard;
@@ -32,7 +32,7 @@ var KeyManager = function(options) {
     this.rotateRight = new KeyState(this, this.rotateRightFunc, null, false, true);
     this.rotate180 = new KeyState(this, this.rotate180Func, null, false, true);
 
-    this.onKeyDown = function(key) {
+    this.onKeyDown = function (key) {
         if (!this.enable) return;
         var leftright = false;
         var isDown = false;
@@ -78,7 +78,7 @@ var KeyManager = function(options) {
         }
     };
 
-    this.onKeyUp = function(key) {
+    this.onKeyUp = function (key) {
         if (!this.enable) return;
         if (key === this.leftKey) {
             this.left.keyUp();
@@ -101,19 +101,19 @@ var KeyManager = function(options) {
         else if (key === this.rotate180Key) {
             this.rotate180.keyUp();
         }
-        else if(key ===82) {
+        else if (key === 82) {
             this.reset();
             clearTimeout(tetris.timerB)
             clearTimeout(tetris.timerA)
             tetris.newStart();
             record = new Recorder(tetris.seed, oper);
         }
-        else if(key ===87) {
+        else if (key === 87) {
             //tetris.botworking=!tetris.botworking;
             tetris.botcall();
         }
-        else if(key ===27) tetris.pause();
-        else if(key ===81) {
+        else if (key === 27) tetris.pause();
+        else if (key === 81) {
             clearTimeout(tetris.timerA)
             clearTimeout(tetris.timerB)
             let str = record.encode();
@@ -121,11 +121,11 @@ var KeyManager = function(options) {
             record.decode(str);
             tetris.replay();
         }
-        else if(key === 85){
+        else if (key === 85) {
             ToclipBoard(record.encode());
         }
     };
-    this.updateInput=function() {
+    this.updateInput = function () {
         var keyboard = option.keyboard;
         if (!keyboard) return;
         this.leftKey = keyboard.left;
@@ -139,39 +139,39 @@ var KeyManager = function(options) {
         this.dasDelay = keyboard.dasDelay;
         this.moveDelay = keyboard.moveDelay;
         this.downDelay = keyboard.downDelay;
-     }
-     this.reset=function() {
+    }
+    this.reset = function () {
         this.left.stop();
         this.right.stop();
         this.down.stop();
-     };
-    this.keyDown = function(event) {
+    };
+    this.keyDown = function (event) {
         var e = event || window.event || arguments.callee.caller.arguments[0];
         var key = e && e.keyCode;
         t.onKeyDown(key);
-       // if (document.querySelector('#Hotkey').style.display == 'none')
+        // if (document.querySelector('#Hotkey').style.display == 'none')
         //e.preventDefault();
     };
 
-    this.keyUp = function(event) {
+    this.keyUp = function (event) {
         var e = event || window.event || arguments.callee.caller.arguments[0];
         var key = e && e.keyCode;
         t.onKeyUp(key);
     }
 
     var t = this;
-    document.body.addEventListener('keydown', t.keyDown,false);
-    document.body.addEventListener('keyup', t.keyUp,false);
+    document.body.addEventListener('keydown', t.keyDown, false);
+    document.body.addEventListener('keyup', t.keyUp, false);
 };
 
-function restartGame(){
+function restartGame() {
     let ev = new KeyboardEvent('keyup', {
         keyCode: 82
     });
     document.body.dispatchEvent(ev);
 }
 
-function botButton(){
+function botButton() {
     let ev = new KeyboardEvent('keyup', {
         keyCode: 87
     });
@@ -183,7 +183,7 @@ function botButton(){
 let startx, starty, movex, movey, endx, endy, nx, ny, angle;
 let movingCountx, movingCounty;
 let cWidth = document.querySelector('#drawCanvas').width;
-let softdropTriggered = false;
+let softdropTriggered = false, operationTriggered = false;
 let softdropPressed = false, softdropHandle = null;
 let touchstartTime;
 //开始触摸函数，event为触摸对象
@@ -222,10 +222,12 @@ function touchs(event) {
         let y_delta = Math.abs(movey - movingCounty)
         if (x_delta >= 20) {
             if (movex - movingCountx < 0) {
+                operationTriggered = true;
                 option.leftFunc()
                 movingCountx = movex;
             }
             else if (movex - movingCountx > 0) {
+                operationTriggered = true;
                 option.rightFunc()
                 movingCountx = movex;
             }
@@ -266,14 +268,16 @@ function touchs(event) {
         softdropPressed = false;
 
 
-        if (ny > 0 && deltaTime < 800)
+        if (ny > 0 && deltaTime < 800 && !operationTriggered)
             option.dropFunc()
 
         softdropTriggered = false;
 
-        if (ny < -20)
+        if (ny < -20 && !operationTriggered)
             option.holdFunc()
         //通过坐标计算角度公式 Math.atan2(y,x)*180/Math.PI
+
+        operationTriggered = false;
 
         /*
         angle = Math.atan2(ny, nx) * 180 / Math.PI;
