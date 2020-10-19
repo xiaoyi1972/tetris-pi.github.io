@@ -1102,7 +1102,8 @@ class Tetris {
         worker.postMessage({
             str: "zbsj", data: {
                 board: tetris.board, thisBlock: tetris.tetro.kind,
-                nexts: workerNexts, hold: workerHold, combo: tetris.Zen_num, b2b: tetris.b2b
+                nexts: workerNexts, hold: workerHold, combo: tetris.Zen_num, b2b: tetris.b2b,
+                timeLimit:option.keyboard.timeLimit
             }
         })
         worker.postMessage({ str: "tz", data: { x: tetris.tetro.pos.x, y: tetris.tetro.pos.y, rs: tetris.tetro.rotateState } })

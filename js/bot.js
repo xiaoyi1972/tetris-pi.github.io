@@ -428,6 +428,7 @@ let x = function () {
             let width = map.width;
             let col_mask_ = ((1 << map.width) - 1) & ~1;
             let row_mask_ = ((1 << map.width) - 1);
+
             for (let x = 0; x < width; ++x) {
                 for (let y = 0; y < roof; ++y) {
                     if (map.full(x, y)) {
@@ -482,6 +483,7 @@ let x = function () {
                 }
                 for (let x = 1; x < width_m1; ++x) {
                     if ((LineHole >> x) & 1) {
+                        v.HoleCount++;
                         v.HoleDepth += ++v.HoleNum[x];
                     }
                     else {
@@ -567,25 +569,24 @@ let x = function () {
                                 if (row2_check == 1 || row2_check == 4) {
                                     result.t2_value += 2;
                                 }
-                                /* if (row2_check == 5) {
-                                     result.t2_value += 2;
-                                 }*/
                                 finding2 = false;
                             }
                         }
                     }
                 }
                 for (let x = 0; finding3 && x < map.width - 3; ++x) {
-                    let row0_check = ((row0 >> x) & 15);
+                    let row0_check = (row0 >> x) & 15;
+                    let row1_check = (row1 >> x) & 15;
                     let row4 = y + 4 < map.height ? map.row[y + 4] : 0;
-                    let stsd0 = ((y - 1) > -1) ? map.full(map.width - (x + 1), y - 1) : 1
-                    let stsd1 = ((y - 1) > -1) ? map.full(map.width - (x + 2), y - 1) : 1
-                    if ((row0_check == 11 || row0_check == 9) && ((row1 >> x) & 15) == 9) {
+                    let stsd0 = ((y - 1) > -1) ? map.full(map.width - 1 - (x + 2), y - 1) : 1
+                    let stsd1 = ((y - 1) > -1) ? map.full(map.width - 1 - (x + 1), y - 1) : 1
+                    if ((row0_check == 11 || row0_check == 9) && (row1_check == 9 || row1_check == 1)) {
                         let t3_value = 0;
                         if ((row0_check == 11 && BitCount(row0) == map.width - 1)
-                            || (row0_check == 9 && BitCount(row0) == map.width - 2 && stsd1)) {
+                            || (row0_check == 9 && BitCount(row0) == map.width - 2 && stsd0)) {
                             t3_value += 1;
-                            if (BitCount(row1) == map.width - 2) {
+                            if ((row1_check == 9 && BitCount(row1) == map.width - 2)
+                                || (row1_check == 1 && BitCount(row1) == map.width - 3)) {
                                 t3_value += 1;
                                 if (((row2 >> x) & 15) == 11) {
                                     t3_value += 2;
@@ -614,12 +615,13 @@ let x = function () {
                             finding3 = false;
                         }
                     }
-                    if ((row0_check == 13 || row0_check == 9) && ((row1 >> x) & 15) == 9) {
+                    if ((row0_check == 13 || row0_check == 9) && (row1_check == 9 || row1_check == 8)) {
                         let t3_value = 0;
                         if ((row0_check == 13 && BitCount(row0) == map.width - 1) ||
-                            (row0_check == 9 && BitCount(row0) == map.width - 2 && stsd0)) {
+                            (row0_check == 9 && BitCount(row0) == map.width - 2 && stsd1)) {
                             t3_value += 1;
-                            if (BitCount(row1) == map.width - 2) {
+                            if ((row1_check == 9 && BitCount(row1) == map.width - 2) ||
+                                (row1_check == 8 && BitCount(row1) == map.width - 3)) {
                                 t3_value += 1;
                                 if (((row2 >> x) & 15) == 13) {
                                     t3_value += 2;
@@ -752,7 +754,7 @@ let x = function () {
                     }
                     break;
             }
-            let rate = 1 / (nexts.length > 0 ? ((depth) + 1) : 1) + 5;// nexts.length + 1 -
+            let rate = 1 / (nexts.length > 0 ? ((depth)) : 1) + 3;// nexts.length + 1 -
             result.max_combo = Math.max(result.combo, result.max_combo);
             result.max_attack = Math.max(result.attack, result.max_attack);
             result.value += ((0
@@ -1930,7 +1932,8 @@ let x = function () {
     class Context {
         constructor(_TetrisOpertion) {
             this.level = [];//保存每一个等级层
-            this.width = 2;
+            this.width = 0;
+            this.width_cache = [];
             this.is_open_hold = true;
             this.tetrisOpertion = _TetrisOpertion
         }
@@ -2133,16 +2136,59 @@ let x = function () {
 
         run() {
             let i = 0;
+
+            if (this.context.width == 0) {
+                let levelSets = this.context.level[0];
+                if (!(levelSets instanceof Array)) return;
+                let presentLevelNodeSets = [];
+                for (let iLevelTree of levelSets) {
+                    if (!iLevelTree.eval()) continue;
+                    presentLevelNodeSets.push(...iLevelTree.children);
+                }
+
+                let level = this.context.level[i + 1]
+                if (level instanceof Array) {
+                    level.push(...presentLevelNodeSets);
+                }
+                else
+                    this.context.level.push(presentLevelNodeSets);
+                i++;
+                this.context.level[i].sort((a, b) => {
+                    {
+                        if (a.value != b.value)
+                            return b.value - a.value;
+                    }
+                })
+                this.context.width = 2;
+            }
+            else {
+                this.context.width += 1;
+                i++;
+            }
+
             let prune_hold = (++this.context.width);
-            let prune_hold_max = prune_hold * 3;
             let next_length_max = this.nexts.length + 1;
+            let div_ratio;
             if (this.context.is_open_hold && this.hold == -1) {
                 --next_length_max;
             }
+            // console.log(next_length_max)
+            if (next_length_max > 0) {
+                let ratio = 1.5;
+                while (next_length_max >= this.context.width_cache.length) {
+                    this.context.width_cache.unshift(Math.pow(this.context.width_cache.length, ratio))
+                }
+                div_ratio = 2 / Math.max(...this.context.width_cache)
+            }
+            // console.log(this.context.width_cache)
             do {
                 //let level_prune_hold = Math.floor((prune_hold_max) * (next_length_max - i) / next_length_max) + prune_hold;
-                let level_prune_hold = prune_hold;
-                //console.log(i, level_prune_hold)
+                //let level_prune_hold = prune_hold;
+                let level_prune_hold = Math.max(1, this.context.width_cache[i - 1] * this.context.width);
+                level_prune_hold = Math.floor(level_prune_hold);
+                //let level_prune_hold = Math.max(1, this.context.width_cache[i-1] * this.context.width * div_ratio)
+
+                // console.log(`i:${i},level_prune_hold:${level_prune_hold}`)
                 let _deepIndex = i;
                 let levelSets = this.context.level[_deepIndex];
                 if (!(levelSets instanceof Array)) return;
@@ -2325,6 +2371,7 @@ let x = function () {
     let holdLock = false;
     let combo;
     let b2b;
+    let timeLimit;
     self.onmessage = function (e) {
         if (e.data.str == "zbsj") {
             let data = e.data.data
@@ -2335,6 +2382,7 @@ let x = function () {
             nexts = data.nexts.slice(0, len)
             combo = data.combo;
             b2b = data.b2b;
+            timeLimit = data.timeLimit;
             /*nexts.push(new Tetro(data.nexts[0]));
             nexts.push(new Tetro(data.nexts[1]));
             nexts.push(new Tetro(data.nexts[2]));*/
@@ -2370,7 +2418,7 @@ let x = function () {
         }
         if (e.data.str == "go") {
             let path = getResult(status.x, status.y, status.t, status.r,
-                bag, hold, holdEnable, holdLock, combo, b2b, map, 80)
+                bag, hold, holdEnable, holdLock, combo, b2b, map, timeLimit)
             self.postMessage({ str: 'complete', result: { move: path } });
             //self.close();
         }

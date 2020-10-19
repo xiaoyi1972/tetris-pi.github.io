@@ -221,6 +221,7 @@ function initKeyMenu() {
     document.getElementById("dasInput").value = option.keyboard.dasDelay;
     document.getElementById("arrInput").value = option.keyboard.moveDelay;
     document.getElementById("dasdownInput").value = option.keyboard.downDelay;
+    document.getElementById("timeLimitInput").value = option.keyboard.timeLimit;
     //document.getElementById("returnInput").value=key[returnKey];
 }
 
@@ -249,6 +250,10 @@ function ReturnChangeArr(e) {
 
 function ReturnChangeDasdown(e) {
     option.keyboard.downDelay = parseInt(e);
+}
+
+function ReturnChangeTimeLimit(e) {
+    option.keyboard.timeLimit = parseInt(e);
 }
 
 function ToclipBoard(str) {
