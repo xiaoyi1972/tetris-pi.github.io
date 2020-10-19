@@ -83,7 +83,7 @@ var option = {
 		dasDelay: 91,
 		moveDelay: 20,
 		downDelay: 12,
-		timeLimit:80
+		timeLimit: 80
 	},
 	keyCodeEncode: {
 		left: 33,
