@@ -2176,7 +2176,7 @@ let x = function () {
             if (next_length_max > 0) {
                 let ratio = 1.5;
                 while (next_length_max >= this.context.width_cache.length) {
-                    this.context.width_cache.push(Math.pow(this.context.width_cache.length+2, ratio))
+                    this.context.width_cache.unshift(Math.pow(this.context.width_cache.length + 2, ratio))
                 }
                 div_ratio = 2 / Math.max(...this.context.width_cache)
             }
@@ -2184,7 +2184,7 @@ let x = function () {
             do {
                 //let level_prune_hold = Math.floor((prune_hold_max) * (next_length_max - i) / next_length_max) + prune_hold;
                 //let level_prune_hold = prune_hold;
-                let level_prune_hold = Math.max(1, this.context.width_cache[i - 1] * this.context.width*div_ratio);
+                let level_prune_hold = Math.max(1, this.context.width_cache[i - 1] * this.context.width * div_ratio);
                 level_prune_hold = Math.floor(level_prune_hold);
                 //let level_prune_hold = Math.max(1, this.context.width_cache[i-1] * this.context.width * div_ratio)
 
@@ -2195,7 +2195,7 @@ let x = function () {
                 let presentLevelNodeSets = [];
                 let pi = 0;
                 for (let iLevelTree of levelSets) {
-                    if (pi == level_prune_hold) break;
+                    if (pi == level_prune_hold && i != 1) break;
                     if (!iLevelTree.eval()) continue;
                     presentLevelNodeSets.push(...iLevelTree.children);
                     pi++;

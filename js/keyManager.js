@@ -185,7 +185,7 @@ let movingCountx, movingCounty;
 let cWidth = document.querySelector('#drawCanvas').width;
 let softdropTriggered = false, operationTriggered = false;
 let softdropPressed = false, softdropHandle = null;
-let touchstartTime;
+let touchstartTime, isMove = false;
 //开始触摸函数，event为触摸对象
 function touchs(event) {
     //阻止浏览器默认滚动事件
@@ -193,6 +193,7 @@ function touchs(event) {
 
     //通过if语句判断event.type执行了哪个触摸事件
     if (event.type == "touchstart") {
+        isMove = false;
         touchstartTime = new Date();
         //console.log('开始');
 
@@ -212,7 +213,7 @@ function touchs(event) {
 
         //触摸中的坐标获取
     } else if (event.type == "touchmove") {
-
+        isMove = true;
         //console.log('滑动中');
         let touch = event.touches[0];
         movex = Math.floor(touch.pageX);
@@ -237,7 +238,7 @@ function touchs(event) {
             if (movey - movingCounty > 0) {
                 if (!softdropTriggered) {
                     softdropTriggered = true;
-                    softdropHandle = setInterval(option.downFunc, 30);
+                    softdropHandle = setInterval(option.downFunc, 25);
                 }
                 movingCounty = movey;
             }
@@ -249,7 +250,7 @@ function touchs(event) {
 
         let deltaTime = new Date() - touchstartTime;
 
-        if (startx == Math.floor(event.changedTouches[0].pageX)) {
+        if (startx == Math.floor(event.changedTouches[0].pageX) && !isMove) {
             if (mouseX < (cWidth / 2))
                 option.rotateRightFunc();
             else if (mouseX > (cWidth / 2))
