@@ -56,6 +56,8 @@ let Block = {
     colors: ['#f7d40c', '#03e4d1', '#d615dc', '#1a5ae4', '#faa70a', '#f0200d', '#85bc3c', '#dcdcdc']
 };
 
+let Piece = { O: 0, I: 1, T: 2, J: 3, L: 4, Z: 5, S: 6 };
+let PieceChar = { 0: "O", 1: "I", 2: "T", 3: "J", 4: "L", 5: "Z", 6: "S" };
 let blockCanvas = document.createElement('canvas');
 //document.body.append(blockCanvas);
 blockCanvas.width = 19 * 10;
@@ -220,25 +222,6 @@ class Tetro {
         return newT;
     }
 
-    qb = () => {
-        let a = `x${this.pos.x}y${this.pos.y}r${this.rotateState}`
-        return a
-    }
-    qbb = () => {
-        let a = "";
-        for (let i = 0; i < this.block.length; i++)
-            for (let j = 0; j < this.block[0].length; j++) {
-                if (this.block[i][j]) {
-                    let b = "";
-                    b = `(${this.pos.y + i},${this.pos.x + j})`;
-                    a += b;
-                }
-            }
-        //a=`x${this.pos.x}y${this.pos.y}$r${this.rotateState}`
-        //a+="r"
-        // a+=this.rotateState
-        return a;
-    }
     /*this.animate = new Pos(0, 0);
     this.resetAnimate = function () {
         this.animate = new Pos(this.pos.x * this.gridArea, this.pos.y * this.gridArea);
@@ -254,6 +237,10 @@ class Pos {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+    }
+    clone() {
+        let pos = new Pos(this.x, this.y);
+        return pos;
     }
 }
 
@@ -319,8 +306,8 @@ class Tetris {
         this.rows = 24; //行数
         this.columns = 10; //列数
         this.gridArea = 20; //格子大小
-        this.drawCtx = document.getElementById('drawCanvas').getContext('2d'); //绘画环境
-        this.nextCanvasCtx = document.getElementById('nextCanvas').getContext('2d'); //序列绘画环境
+        this.drawCtx = document.querySelector('#drawCanvas').getContext('2d'); //绘画环境
+        this.nextCanvasCtx = document.querySelector('#nextCanvas').getContext('2d'); //序列绘画环境
         this.holdSys; //暂存对象
         this.randomSys; //随机序列对象
         this.fix = 0; //锁定
@@ -570,19 +557,8 @@ class Tetris {
             if (record.isEnd())
                 this.isReplay = false
         }
-        /*if (this.restart) {
-            cancelAnimationFrame(this.timer);
-            let r = this.startReplay;
-            tetris = new Tetris();
-            if (r)
-                tetris.isReplay = 1;
-            tetris.init();
-            return;
-        }*/
         document.querySelector("#t").innerHTML = `${this.tetro.pos.x},${this.tetro.pos.y}`
-        //this.particle.rms = _time;
         this.particle.update(_time - this.preTime);
-        //console.log(_time-this.preTime)
         this.preTime = _time;
         if (this.botworking)
             this.botcall();
@@ -631,13 +607,11 @@ class Tetris {
         this.startTime = new Date();
         let div = document.querySelector('.message');
         div.style.display = 'none';
-        let t = this;
         this.bg();
         this.timer = requestAnimationFrame(this.loop);
     }
 
     test_map() {
-
         let t = this;
         let o = function (t) {
             for (let x = 0; x < t.board.length; x++)
@@ -667,7 +641,7 @@ class Tetris {
         this.board[21] = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1];
         this.board[22] = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0];
         this.board[23] = [0, 1, 0, 1, 0, 1, 0, 1, 0, 1];*/
-        /*let lastnum = -1;
+        let lastnum = -1;
         for (let i = 1; i < 15; i++) {
             this.board[this.rows - i] = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
             let num
@@ -676,11 +650,11 @@ class Tetris {
             } while (num == lastnum)
             lastnum = num;
             this.board[this.rows - i][num] = 0;
-        }*/
+        }
 
-        this.board[21] = [1, 1, 1, 1, 0, 0, 1, 1, 1, 1];
-        this.board[22] = [1, 1, 1, 0, 0, 0, 1, 1, 1, 1];
-        this.board[23] = [1, 1, 1, 1, 1, 0, 1, 1, 1, 1];
+        //this.board[21] = [1, 1, 1, 1, 0, 0, 1, 1, 1, 1];
+        //this.board[22] = [1, 1, 1, 0, 0, 0, 1, 1, 1, 1];
+        //this.board[23] = [1, 1, 1, 1, 1, 0, 1, 1, 1, 1];
         o(t);
     }
 
@@ -957,9 +931,9 @@ class Tetris {
         if (summary > 0)
             this.b2b = (Tspin || (Tetris && summary == 4));
 
-            //console.log(this.count)
-        if(this.count==0){
-            at="perfectclear"
+        //console.log(this.count)
+        if (this.count == 0) {
+            at = "perfectclear"
             clearFlag = `<span style="color:${'rgba(145,17,247)'}">perfect clear</span>`;
         }
 
@@ -971,7 +945,7 @@ class Tetris {
                     div.parentNode.removeChild(div);
             }, false);
             div.innerHTML = clearFlag;
-          
+
             div.classList.add("test1");
             div.classList.add(`anime${at}`);
             //console.log(clearFlag)
@@ -1038,11 +1012,6 @@ class Tetris {
         this.fix = 0;
     }
 
-    newGame() {
-        tetris = null;
-        tetris = new Tetris();
-    }
-
     success() {
         return;
         let div = document.querySelector('.message');
@@ -1084,15 +1053,47 @@ class Tetris {
             workerHold = -1
         }
 
-        nexts.push(new Tetro(tetris.randomSys.displayBag[0]));
-        nexts.push(new Tetro(tetris.randomSys.displayBag[1]));
-        nexts.push(new Tetro(tetris.randomSys.displayBag[2]));
         workerNexts.push(tetris.randomSys.displayBag[0])
         workerNexts.push(tetris.randomSys.displayBag[1])
         workerNexts.push(tetris.randomSys.displayBag[2])
         workerNexts.push(tetris.randomSys.displayBag[3])
         workerNexts.push(tetris.randomSys.displayBag[4])
         workerNexts.push(tetris.randomSys.displayBag[5])
+
+        let nextsChar = "", holdChar, Active = PieceChar[tetris.tetro.kind];
+        if (workerHold == -1)
+            holdChar = " ";
+        else
+            holdChar = PieceChar[workerHold];
+
+        for (let i of workerNexts) {
+            nextsChar += PieceChar[i];
+        }
+        // console.log(nextsChar, holdChar, Active)
+
+        function fieldToMM(_field) {
+            let mField = new Array(23).fill(0)
+            for (let j = 1; j < 24; j++) {
+                mField[j - 1] = 0;
+                for (let i = 0; i < 10; i++) {
+                    if (_field[j][i] == 0) {
+                        mField[j - 1] &= ~(1 << i);
+                    }
+                    else {
+                        mField[j - 1] |= (1 << i);
+                    }
+                }
+            }
+            return mField;
+        }
+
+
+        let mFeild = fieldToMM(tetris.board);
+        // mFeild.splice(0,1);
+        /*let result = getZZZTOJ(mFeild, nextsChar, holdChar, Active,
+            tetris.holdSys.able, tetris.Zen_num, tetris.b2b)
+        let move = convertoBotOper(result)
+        playaction(move, 0)*/
         //nexts.push(new Tetro(tetris.randomSys.displayBag[3]));
         //console.log(next);
 
@@ -1101,12 +1102,14 @@ class Tetris {
 
         worker.postMessage({
             str: "zbsj", data: {
-                board: tetris.board, thisBlock: tetris.tetro.kind,
-                nexts: workerNexts, hold: workerHold, combo: tetris.Zen_num, b2b: tetris.b2b,
-                timeLimit:option.keyboard.timeLimit
+                board: mFeild, thisBlock: Active,
+                nexts: nextsChar, hold: holdChar,
+                combo: tetris.Zen_num, b2b: tetris.b2b,
+                canHold: tetris.holdSys.able,
+                timeLimit: 120
             }
         })
-        worker.postMessage({ str: "tz", data: { x: tetris.tetro.pos.x, y: tetris.tetro.pos.y, rs: tetris.tetro.rotateState } })
+        //worker.postMessage({ str: "tz", data: { x: tetris.tetro.pos.x, y: tetris.tetro.pos.y, rs: tetris.tetro.rotateState } })
         worker.postMessage({ str: "go" })
         /*worker.postMessage({str:"board",data:tetris.board})
         worker.postMessage({str:"nexts",data:workerNexts})
@@ -1117,7 +1120,7 @@ class Tetris {
             if (str == "complete") {
                 let res = e.data.result;
                 let move = convertoBotOper(res.move)
-                console.log(res.move)
+              //  console.log(res.move)
                 playaction(move, 0)
 
                 //console.log(res)
@@ -1126,8 +1129,8 @@ class Tetris {
         };
 
         return
-        bot.setParam(tetris.board, tetris.tetro, nexts, hold);
-        let result = bot.test();
+        // bot.setParam(tetris.board, tetris.tetro, nexts, hold);
+        //let result = bot.test();
         // console.log(result)
         //let result = bot.getResult();
         //botOper(1)
@@ -1152,7 +1155,7 @@ class Tetris {
                 playaction(move, index + 1)
             }, tm)
         }
-        playaction(result.move, 0)
+        //  playaction(result.move, 0)
         // tetris.tetro.pos = new Pos(result.pos.x, result.pos.y);
 
     }
@@ -1228,3 +1231,46 @@ var blob = new Blob([str]);
 var url = window.URL.createObjectURL(blob);
 let worker = new Worker(url);
 //let bot = new Bot();
+
+/*
+function getZZZTOJ(feild, nexts, curHold, active, canhold, combo, b2b) {
+    let a = feild;
+    let /*a = new Array(24).fill(0),*//* b = new Array(8).fill(0);
+/* let comboTable = [0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5, - 1];
+// let nexts = "IJOZSTL", curHold = ' ', active = "T";
+let toTypedArray = (arr) => {
+    let typedArray = new Int32Array(arr.length)
+    for (let i = 0, len = arr.length; i < len; i++) {
+        typedArray[i] = arr[i]
+    }
+    let buffer = Module._malloc(typedArray.length * typedArray.BYTES_PER_ELEMENT);
+    Module.HEAP32.set(typedArray, buffer >> 2);
+    return buffer;
+}
+let a_ = toTypedArray(a);
+let b_ = toTypedArray(b);
+let comboTable_ = toTypedArray(comboTable);
+//let buffer = Module._malloc(a_.length * a_.BYTES_PER_ELEMENT);
+//Module.Heap32.set(a_, buffer >> 2);
+
+let result = Module._TetrisAI(
+    b_,
+    a_,
+    10, 22, b2b, combo,
+    allocate(intArrayFromString(nexts), ALLOC_NORMAL),
+    curHold.charCodeAt(0),//allocate(intArrayFromString(curHold), ALLOC_NORMAL),
+    true,
+    active.charCodeAt(0),//allocate(intArrayFromString(active), ALLOC_NORMAL),
+    3, 0, 0, canhold,
+    false, 0, comboTable_, 6, 8, 1);
+let res = UTF8ToString(result)
+let arr = []
+for (let i = 0; i < res.length; i++) {
+    arr.push(res[i])
+}
+Module._free(a_)
+Module._free(b_)
+Module._free(comboTable_)
+return arr;
+}
+*/
